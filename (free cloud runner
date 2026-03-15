@@ -1,0 +1,55 @@
+name: Daily Content Automation
+
+on:
+  schedule:
+    # Runs every day at 6:00 AM Jakarta time (23:00 UTC)
+    - cron: '0 23 * * *'
+  workflow_dispatch:  # Also allows manual trigger
+
+jobs:
+  create-and-post:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run trend finder
+      run: python trend_finder.py
+
+    - name: Write script with Claude AI
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: python script_writer.py
+
+    - name: Generate voiceover
+      run: python tts_voice.py
+
+    - name: Create video
+      run: python make_video.py
+
+    - name: Upload to YouTube
+      env:
+        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+      run: python uploader.py
+
+1. Go to: github.com — create free account
+2. Create new repository (private is fine)
+3. Upload all your .py files
+4. Go to Settings > Secrets > Actions
+5. Add secrets:
+   - ANTHROPIC_API_KEY → your Claude API key
+   - YOUTUBE_TOKEN → base64 of your token.pickle
+6. Push the .yml workflow file
+7. Done — it runs automatically every day!
+
+Cost: $0 (GitHub gives 2000 free minutes/month)
+Each run uses ~5-10 minutes = 200+ runs free
