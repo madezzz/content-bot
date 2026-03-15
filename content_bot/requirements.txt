@@ -1,0 +1,10 @@
+anthropic
+requests
+requests-oauthlib
+moviepy
+pillow
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
+pytrends
+feedparser
